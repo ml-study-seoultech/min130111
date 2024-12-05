@@ -1,0 +1,23 @@
+# 결과 파일들
+results/
+*.png
+*.jpg
+*.jpeg
+
+# 데이터 파일들
+data/
+*.csv
+*.xlsx
+*.json
+
+# 파이썬 관련 파일들
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+.ipynb_checkpoints/
+
+# IDE 관련 파일들
+.vscode/
+.idea/ 
