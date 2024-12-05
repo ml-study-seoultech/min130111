@@ -23,7 +23,7 @@ class DamagedImageDataset(Dataset):
         
         # 이미지 전처리
         self.transform = transforms.Compose([
-            # transforms.Grayscale(),  # 흑백 이미지
+            transforms.Grayscale(),  # 흑백 이미지
             transforms.ToTensor(),   # [0, 255] -> [0, 1]
             transforms.Normalize([0.5], [0.5])  # [0, 1] -> [-1, 1]
         ])
@@ -48,10 +48,10 @@ class DamagedImageDataset(Dataset):
         
         return input_tensor, gt_tensor
 
-# def create_random_mask(size=256, mask_size=128):
-#     """중앙에 랜덤한 마스크 생성"""
-#     mask = torch.ones((size, size))
-#     x = np.random.randint(0, size - mask_size)
-#     y = np.random.randint(0, size - mask_size)
-#     mask[x:x+mask_size, y:y+mask_size] = 0
-#     return mask 
+def create_random_mask(size=256, mask_size=128):
+    """중앙에 랜덤한 마스크 생성"""
+    mask = torch.ones((size, size))
+    x = np.random.randint(0, size - mask_size)
+    y = np.random.randint(0, size - mask_size)
+    mask[x:x+mask_size, y:y+mask_size] = 0
+    return mask 

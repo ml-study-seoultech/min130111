@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torch.optim import Adam
 from model import ContextEncoder
 from dataset import DamagedImageDataset
 from utils import save_images
 
-def train(model, train_loader, criterion, optimizer, device, num_epochs=20):
+def train(model, train_loader, val_loader, criterion, optimizer, device, num_epochs=20):
     model.train()
     
     for epoch in range(num_epochs):
@@ -46,17 +46,29 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
     
-    # 데이터셋 로드 (num_samples=None이면 전체 데이터 사용, 샘플 개수 지정)
-    dataset = DamagedImageDataset('data/raw/train.csv', num_samples= 10)
-    train_loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
-
+    # 1000장의 데이터 사용
+    dataset = DamagedImageDataset('data/raw/train.csv', num_samples=1000)
+    
+    # 학습/검증 데이터 분할 (90% 학습, 10% 검증)
+    train_size = int(0.9 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    
+    # 데이터로더 생성
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)  # 배치 크기를 32로 설정
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4)
+    
+    print(f'Total samples: 1000')
+    print(f'Training samples: {len(train_dataset)}')
+    print(f'Validation samples: {len(val_dataset)}')
+    
     # 모델 초기화
     model = ContextEncoder().to(device)
     criterion = nn.MSELoss()
     optimizer = Adam(model.parameters(), lr=0.0002, betas=(0.5, 0.999))
     
     # 학습 시작
-    train(model, train_loader, criterion, optimizer, device)
+    train(model, train_loader, val_loader, criterion, optimizer, device)
 
 if __name__ == '__main__':
     main() 
